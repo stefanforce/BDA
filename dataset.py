@@ -99,7 +99,7 @@ def add_custom_dataframe_column(input_dataframe, input_column_name, input_column
     return input_dataframe
 
 
-def transpose_xml_into_dataframe(sqlContext, input_path):
+def transpose_xml_into_dataframe(sqlContext, input_path, trainModel = False):
     output_dataframe = sqlContext.read.format("xml") \
         .option("rootTag", "PubmedArticleSet") \
         .option("rowTag", "PubmedArticle") \
@@ -213,6 +213,11 @@ def transpose_xml_into_dataframe(sqlContext, input_path):
     aux_dataframe_references_graph = output_dataframe.select("PubMedID")
     aux_dataframe_references_graph.write.option("header", True) \
         .csv("/IDs")
+
+    if trainModel == True :
+        output_dataframe = output_dataframe.drop("References")
+        output_dataframe = output_dataframe.drop("ListOfAffiliations")
+
 
     return output_dataframe
 

@@ -2,7 +2,8 @@ import os
 import sys
 import warnings
 
-from dataset import transpose_xml_into_dataframe
+from dataset import transpose_xml_into_dataframe, dataset_csv_to_dataframe
+from algo import get_column_correlations
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession
 
@@ -22,5 +23,13 @@ def init_spark():
 if __name__ == '__main__':
     my_instance_of_spark, sc = init_spark()
     # xml data to dataframe
-    process_data = transpose_xml_into_dataframe(my_instance_of_spark, "data.xml")
+    process_data = transpose_xml_into_dataframe(my_instance_of_spark, "data.xml", True)
+
+    #print process data headers
+
+    print(process_data.columns)
+
+    # process_data = dataset_csv_to_dataframe(my_instance_of_spark, 'mycsv.csv')
+
+    columns = get_column_correlations(process_data)
     # TBD - ML algorithm
