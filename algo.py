@@ -1,4 +1,24 @@
+import math
+
 # function for getting the best corelations from the dataset
+
+def get_column_correlations(df_set, correlation_threshold=0):
+    columns = [column for column in df_set.schema.names if column not in ["PubMedID", "Rating"]]
+    correlations = []
+
+    if correlation_threshold is not None:
+        for column in columns:
+            correlation = df_set.stat.corr(column, "Rating")
+            if math.isnan(correlation) or abs(correlation) < correlation_threshold:
+                continue
+            correlations.append((column, correlation))
+
+        correlations = list(reversed(sorted(correlations, key=lambda x: abs(x[1]))))
+        correlations = correlations[0:5]
+
+        print("Columns and Correlations", correlations)
+        return [cor[0] for cor in correlations]
+    return columns
 
 # function to generate train model using some weights
 

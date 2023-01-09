@@ -215,3 +215,46 @@ def transpose_xml_into_dataframe(sqlContext, input_path):
         .csv("/IDs")
 
     return output_dataframe
+
+def dataset_csv_to_dataframe(scContext, data_path):
+
+    df_set = scContext.read.option("header",True) \
+                .csv(data_path)
+                
+    df_set = df_set.withColumn("PubMedID",
+                                      df_set["PubMedID"]
+                                      .cast(PY_SPARK_TYPES.StringType()))
+
+    df_set = df_set.withColumn("NumberAuthors",
+                                        df_set["NumberAuthors"]
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("NumberAffiliationAuthor",
+                                        df_set["NumberAffiliationAuthor"]
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("TitleLength",
+                                        df_set["TitleLength"]   
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("NumberKeywords",
+                                        df_set["NumberKeywords"]
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("NumberGrants",
+                                        df_set["NumberGrants"]  
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("NumberGrantAgencies",
+                                        df_set["NumberGrantAgencies"]
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("NumberReferences",
+                                        df_set["NumberReferences"]  
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    df_set = df_set.withColumn("Rating",
+                                        df_set["Rating"]
+                                        .cast(PY_SPARK_TYPES.IntegerType()))
+
+    return df_set
