@@ -210,9 +210,9 @@ def transpose_xml_into_dataframe(sqlContext, input_path, trainModel = False):
     aux_dataframe_references.show(600, truncate=False)
     aux_dataframe_references.printSchema()
 
-    aux_dataframe_references_graph = output_dataframe.select("PubMedID")
-    aux_dataframe_references_graph.write.option("header", True) \
-        .csv("/IDs")
+    # aux_dataframe_references_graph = output_dataframe.select("PubMedID")
+    # aux_dataframe_references_graph.write.option("header", True) \
+    #     .csv("/IDs")
 
     if trainModel == True :
         output_dataframe = output_dataframe.drop("References")

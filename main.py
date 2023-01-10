@@ -3,7 +3,7 @@ import sys
 import warnings
 
 from dataset import transpose_xml_into_dataframe, dataset_csv_to_dataframe
-from algo import get_column_correlations
+from algo import get_column_correlations, generate_features, generate_model
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession
 
@@ -23,13 +23,43 @@ def init_spark():
 if __name__ == '__main__':
     my_instance_of_spark, sc = init_spark()
     # xml data to dataframe
-    process_data = transpose_xml_into_dataframe(my_instance_of_spark, "data.xml", True)
+    # process_data = transpose_xml_into_dataframe(my_instance_of_spark, "data.xml", True)
 
-    #print process data headers
 
-    print(process_data.columns)
-
-    # process_data = dataset_csv_to_dataframe(my_instance_of_spark, 'mycsv.csv')
+    process_data = dataset_csv_to_dataframe(my_instance_of_spark, 'mycsv.csv')
 
     columns = get_column_correlations(process_data)
+
+    features = generate_features(process_data, columns)
+
+    splits = features.randomSplit([0.8, 0.2])  # 80% 20% is the recomended way to split data for training machine
+    train_df = splits[0]
+    test_df = splits[1]
+
+    lr_model = generate_model(train_df)
+
+    print("Coefficients: " + str(lr_model.coefficients))
+
+    trainResult = lr_model.summary
+
+    print("numIterations: %d" % trainResult.totalIterations)
+    print("objectiveHistory: %s" % str(trainResult.objectiveHistory))
+    trainResult.residuals.show()
+
+    # RMSE - root mean square error - indicator folosit pentru a analiza diferenta intre valorile preziste de model si valorile reale
+    print("rmse - %f" % trainResult.rootMeanSquaredError)
+    print("r-square: %f" % trainResult.r2)
+
+    features.describe().show()
+
+    predictions = lr_model.transform(test_df)
+
+    # Predictiile cu obtinute cu linear regression, in csv
+    predictions.select("prediction", "Rating", "features").toPandas().to_csv("test.csv")
+
+    predictions.select("prediction", "Rating", "features").show(10)
+
+    # predicted_score.show()
+
+
     # TBD - ML algorithm
